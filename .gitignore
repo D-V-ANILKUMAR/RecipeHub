@@ -1,0 +1,28 @@
+# Environment variables
+.env
+*.env
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+*.local
+
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+venv/
+env/
+
+# Uploads and temporary files
+static/uploads/videos/*
+static/uploads/profiles/*
+!static/uploads/videos/.gitkeep
+!static/uploads/profiles/.gitkeep
+/tmp/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
