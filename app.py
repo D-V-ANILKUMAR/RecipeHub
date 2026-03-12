@@ -1,7 +1,8 @@
 import os
 from flask import Flask, request, jsonify, session, send_from_directory
 from flask_cors import CORS
-import pymysql
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
@@ -31,12 +32,9 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def get_db_connection():
-    return pymysql.connect(
-        host=os.getenv("DB_HOST", "localhost"),
-        user=os.getenv("DB_USER", "root"),
-        password=os.getenv("DB_PASSWORD", ""),
-        database=os.getenv("DB_NAME", "recipe_video_app"),
-        cursorclass=pymysql.cursors.DictCursor
+    return psycopg2.connect(
+        os.getenv("DATABASE_URL", "postgresql://neondb_owner:npg_kA0uD5SOmMhP@ep-lucky-cherry-aib8pb05-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require"),
+        cursor_factory=RealDictCursor
     )
 
 @app.route('/')

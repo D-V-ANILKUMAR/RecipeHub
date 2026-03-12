@@ -1,71 +1,37 @@
-import pymysql
+import psycopg2
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_USER = os.getenv("DB_USER", "root")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "7842909856a@A")
-DB_NAME = os.getenv("DB_NAME", "recipe_video_app")
-
-def create_database():
-    # Connect to MySQL server (no database selected yet)
-    try:
-        conn = pymysql.connect(host=DB_HOST, user=DB_USER, password=DB_PASSWORD)
-        cursor = conn.cursor()
-        
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME}")
-        print(f"Database '{DB_NAME}' checked/created.")
-        
-        cursor.close()
-        conn.close()
-    except Exception as e:
-        print(f"Error creating database: {e}")
-        return
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://neondb_owner:npg_kA0uD5SOmMhP@ep-lucky-cherry-aib8pb05-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require")
 
 def create_tables():
     try:
-        conn = pymysql.connect(host=DB_HOST, user=DB_USER, password=DB_PASSWORD, database=DB_NAME)
+        conn = psycopg2.connect(DATABASE_URL)
         cursor = conn.cursor()
         
         # Create users table
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             username VARCHAR(50) UNIQUE NOT NULL,
+            full_name VARCHAR(100),
             password VARCHAR(255) NOT NULL,
             email VARCHAR(100),
             gender VARCHAR(20),
             phone_number VARCHAR(20),
             profile_photo VARCHAR(255),
-            role ENUM('user', 'admin') DEFAULT 'user',
+            role VARCHAR(20) DEFAULT 'user',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         """)
         print("Users table checked/created.")
         
-        # Add new columns if they don't exist
-        try:
-            cursor.execute("ALTER TABLE users ADD COLUMN full_name VARCHAR(100) AFTER username")
-        except: pass
-        try:
-            cursor.execute("ALTER TABLE users ADD COLUMN email VARCHAR(100) AFTER password")
-        except: pass
-        try:
-            cursor.execute("ALTER TABLE users ADD COLUMN gender VARCHAR(20) AFTER email")
-        except: pass
-        try:
-            cursor.execute("ALTER TABLE users ADD COLUMN phone_number VARCHAR(20) AFTER gender")
-        except: pass
-        try:
-            cursor.execute("ALTER TABLE users ADD COLUMN profile_photo VARCHAR(255) AFTER phone_number")
-        except: pass
-
         # Create recipes table
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS recipes (
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             title VARCHAR(100) NOT NULL,
             description TEXT NOT NULL,
             video_filename VARCHAR(255),
@@ -94,5 +60,4 @@ def create_tables():
         print(f"Error setting up tables: {e}")
 
 if __name__ == "__main__":
-    create_database()
     create_tables()
